@@ -1,0 +1,80 @@
+ 1 language
+ 2 
+ 3 CL case
+ 4 CL comment
+ 5 CL DialectName
+ 6 CL Extention
+ 7 CL Multiline
+ 8 CL Process
+ 9 CL varch
+11 CL constantBranchToNextLine
+12 ConstantDelimiters
+13 ConstantQuote
+
+15 Delete
+16 DrillDown
+17 Error
+18 (Was exit)
+19 Extension (see 6, 25)
+20 FCCL case ( See 3)
+21 FCCL comment (See 4)
+22 FCCL Default_roots
+23 FCCL DialectName (see 5)
+24 FCCL ErrorMessage
+25 FCCL Extension (See 19, 6)
+26 FCCL process (See 8)
+27 FCCL root (See 22)
+28 FCCL varchars (See 9)
+ 
+30 finish (See 18)
+31 format color
+32 format datatype
+33 format filename
+34 format language
+35 format line
+36 format micro code text
+37 format notes
+38 format order
+39 format path
+40 format point
+41 format set
+42 format stroke
+43 format syntax
+44 format use
+45 function
+46 
+47 
+48 
+
+
+48 Ignore
+49  (Was keyword, keywords)
+50 author
+51 Line
+52 Lines
+53 Marker Branch To Next Line
+54 Marker Came From Line
+56 MicroCode
+57 Name
+58 Notes
+60 Operator, Operators
+61 Option
+62 Order
+63 Path
+64 Point
+65 Route
+66 delimiters
+67 dump
+68 grids
+69 option
+70 options
+71 points
+72 scale
+73 text
+74 Stroke
+75 Syntax
+76 translate
+77 Use
+78 Version
+
+

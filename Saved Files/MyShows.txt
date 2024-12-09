@@ -1,0 +1,177 @@
+
+
+
+Module MyShows
+
+
+    'todo BUG this is not correctly handling 'expanded'
+    Friend Function MyShowFlowChartRecord(ByRef SourceForm As Source, expanded As Boolean, IndexFlowChart As Integer) As String
+
+        If expanded = True Then
+            LogDebug(3590, Err7, "Do I really really want to expand this?  Make sure it never gets output into a file")
+        End If
+        Select Case LCase(FlowChart_TableCode(SourceForm, IndexFlowChart))
+            Case My_keyWord(My_KeyConstUse)
+                MyShowFlowChartRecord = FlowChart_TableCode(SourceForm, IndexFlowChart) & "=" & FlowChart_TableSymbol_Name(SourceForm, IndexFlowChart)
+                MyShowFlowChartRecord &= FD & FlowChart_TableX1(SourceForm, IndexFlowChart)
+                MyShowFlowChartRecord &= FD & FlowChart_TableY1(SourceForm, IndexFlowChart)
+                MyShowFlowChartRecord &= FD & FlowChart_Table_Rotation(SourceForm, IndexFlowChart)
+                MyShowFlowChartRecord &= FD & FlowChart_TableOption(SourceForm, IndexFlowChart)
+                MyShowFlowChartRecord &= FD & FlowChart_tablePathSymbolName(SourceForm, IndexFlowChart)
+                MyShowFlowChartRecord &= FD & FlowChart_TableSymbol_Name(SourceForm, IndexFlowChart)
+                If expanded = True Then
+                    MyShowFlowChartRecord &= vbTab & "\DataType=" & FlowChart_TableDataType(SourceForm, IndexFlowChart)
+                    MyShowFlowChartRecord &= vbTab & "\Index=" & IndexFlowChart.ToString
+                    If FlowChart_TableCode(SourceForm, IndexFlowChart) = "/path" Then
+                        MyShowFlowChartRecord &= FD & vbTab & "\PathName=" & PrintAbleNull(FlowChart_TablePathName(SourceForm, IndexFlowChart))
+                    End If
+                    MyShowFlowChartRecord &= FD & vbTab & "\Index=" & IndexFlowChart.ToString
+                    MyShowFlowChartRecord &= FD & vbTab & "\PathNumber=" & PrintAbleNull(FlowChart_TablePathNumber(SourceForm, IndexFlowChart).ToString)
+                    MyShowFlowChartRecord &= FD & vbTab & "\PathName=" & FlowChart_TablePathName(SourceForm, IndexFlowChart)
+                    MyShowFlowChartRecord &= FD & vbTab & "\SymbolName=" & FlowChart_TableSymbol_Name(SourceForm, IndexFlowChart)
+                    MyShowFlowChartRecord &= FD & vbTab & "\Path_SymbolName=" & FlowChart_Table_Path_SymbolName(SourceForm, IndexFlowChart)
+                    MyShowFlowChartRecord &= FD & vbTab & "\Option=" & FlowChart_TableOption(SourceForm, IndexFlowChart)
+                    MyShowFlowChartRecord &= FD & vbTab & "\DataType=" & FlowChart_TableDataType(SourceForm, IndexFlowChart)
+                    MyShowFlowChartRecord &= FD & vbTab & "\Rotation=" & FlowChart_Table_Rotation(SourceForm, IndexFlowChart)
+                End If
+            Case "/path"
+                MyShowFlowChartRecord = FlowChart_TableCode(SourceForm, IndexFlowChart) & "=" & FlowChart_TablePathName(SourceForm, IndexFlowChart)
+                MyShowFlowChartRecord &= FD & FlowChart_TableX1(SourceForm, IndexFlowChart)
+                MyShowFlowChartRecord &= FD & FlowChart_TableY1(SourceForm, IndexFlowChart)
+                MyShowFlowChartRecord &= FD & FlowChart_TableX2(SourceForm, IndexFlowChart)
+                MyShowFlowChartRecord &= FD & FlowChart_TableY2(SourceForm, IndexFlowChart)
+                'todo This return the name of the path?
+                'Bug
+                MyShowFlowChartRecord &= FD & FlowChart_TableDataType(SourceForm, IndexFlowChart)
+                If expanded = True Then
+                    MyShowFlowChartRecord &= FD & vbTab & "\DataType=" & FlowChart_TableDataType(SourceForm, IndexFlowChart)
+                    MyShowFlowChartRecord &= FD & vbTab & "\Option=" & FlowChart_TableOption(SourceForm, IndexFlowChart)
+                    MyShowFlowChartRecord &= FD & vbTab & "\Link#=" & PrintAbleNull(FlowChart_TablePathNumber(SourceForm, IndexFlowChart).ToString)
+                    MyShowFlowChartRecord &= FD & vbTab & "\Index=" & IndexFlowChart.ToString
+                    MyShowFlowChartRecord &= FD & vbTab & "\pathSymbolName=" & FlowChart_Table_Path_SymbolName(SourceForm, IndexFlowChart)
+                    MyShowFlowChartRecord &= FD & vbTab & "\PathName=" & FlowChart_TablePathName(SourceForm, IndexFlowChart)
+                    MyShowFlowChartRecord &= FD & vbTab & "\DataType=" & FlowChart_TableDataType(SourceForm, IndexFlowChart)
+                    MyShowFlowChartRecord &= FD & vbTab & "\pathSymbolName=" & FlowChart_Table_Path_SymbolName(SourceForm, IndexFlowChart)
+                    ' THERE IS NO ROTATION ON A PATH MyShowFlowChartRecord &= FD & "\Rotation=" & FlowChart_Table_Rotation(SourceForm  ,   IndexFlowChart)
+                End If
+            Case "/Error"
+                'This is for debugging only need to fix
+                'todo make this into the correct import/export format
+                'FormatError="/Error=Code" & Comma &  " name" & Comma &  " x1" & Comma &  " y1" & Comma &  " Name " & Comma &  " {other things maybe}"
+                If expanded = False Then
+                    MyShowFlowChartRecord = FlowChart_TableCode(SourceForm, IndexFlowChart) & "=" & FindInSymbolList(SourceForm, FlowChart_TableOther_Name(SourceForm, IndexFlowChart))
+                    MyShowFlowChartRecord &= FD & " (" & FlowChart_TableX1(SourceForm, IndexFlowChart)
+                    MyShowFlowChartRecord &= FD & FlowChart_TableY1(SourceForm, IndexFlowChart)
+                    MyShowFlowChartRecord &= ")_(" & FlowChart_TableX2(SourceForm, IndexFlowChart)
+                    MyShowFlowChartRecord &= FD & FlowChart_TableY2(SourceForm, IndexFlowChart) & ") "
+                    MyShowFlowChartRecord &= FD & FlowChart_TableDataType(SourceForm, IndexFlowChart)
+                Else
+                    MyShowFlowChartRecord = FlowChart_TableCode(SourceForm, IndexFlowChart) & "=" & FindInSymbolList(SourceForm, FlowChart_TableOther_Name(SourceForm, IndexFlowChart))
+                    MyShowFlowChartRecord &= "(" & FlowChart_TableX1(SourceForm, IndexFlowChart)
+                    MyShowFlowChartRecord &= FD & FlowChart_TableY1(SourceForm, IndexFlowChart)
+                    MyShowFlowChartRecord &= ")_(" & FlowChart_TableX2(SourceForm, IndexFlowChart)
+                    MyShowFlowChartRecord &= FD & FlowChart_TableY2(SourceForm, IndexFlowChart) & ") "
+                    MyShowFlowChartRecord &= FD & FlowChart_TableDataType(SourceForm, IndexFlowChart)
+                    MyShowFlowChartRecord &= FD & vbTab & "\Index=" & IndexFlowChart.ToString
+                    'MyShowFlowChartRecord &= FD & PrintAbleNull(FlowChart_Table_Rotation(SourceForm  ,   IndexFlowChart))
+                    MyShowFlowChartRecord &= FD & PrintAbleNull(FlowChart_TableDataType(SourceForm, IndexFlowChart))
+                    MyShowFlowChartRecord &= FD & PrintAbleNull(FlowChart_TablePathName(SourceForm, IndexFlowChart))
+                    MyShowFlowChartRecord &= FD & PrintAbleNull(FlowChart_TablePathNumber(SourceForm, IndexFlowChart).ToString)
+                    ' removed     my show Flow Chart record &= FD &  PrintAbleNull(FlowChart_TableCompiledMacroCodeText(IndexFlowChart ))
+                    MyShowFlowChartRecord &= FD & vbTab & "\PathNumber=" & PrintAbleNull(FlowChart_TablePathNumber(SourceForm, IndexFlowChart).ToString)
+                    MyShowFlowChartRecord &= FD & vbTab & "\Index=" & IndexFlowChart.ToString
+                    MyShowFlowChartRecord &= FD & vbTab & "\Path_SymbolName=" & FlowChart_Table_Path_SymbolName(SourceForm, IndexFlowChart)
+                    MyShowFlowChartRecord &= FD & vbTab & "\Option=" & FlowChart_TableOption(SourceForm, IndexFlowChart)
+                    MyShowFlowChartRecord &= FD & vbTab & "\OtherName=" & FlowChart_TableOther_Name(SourceForm, IndexFlowChart)
+                    MyShowFlowChartRecord &= FD & vbTab & "\PathName=" & FlowChart_TablePathName(SourceForm, IndexFlowChart)
+                    MyShowFlowChartRecord &= FD & vbTab & "\PathNumber=" & FlowChart_TablePathNumber(SourceForm, IndexFlowChart)
+                    MyShowFlowChartRecord &= FD & vbTab & "\Path_Name=" & FlowChart_TablePathName(SourceForm, IndexFlowChart)
+                    MyShowFlowChartRecord &= FD & vbTab & "\SymbolName=" & FlowChart_TableSymbol_Name(SourceForm, IndexFlowChart)
+                    MyShowFlowChartRecord &= FD & vbTab & "\DataType=" & FlowChart_TableDataType(SourceForm, IndexFlowChart)
+                    MyShowFlowChartRecord &= FD & vbTab & "\Path_SymbolName=" & FlowChart_Table_Path_SymbolName(SourceForm, IndexFlowChart)
+                    MyShowFlowChartRecord &= FD & vbTab & "\Rotation=" & FlowChart_Table_Rotation(SourceForm, IndexFlowChart)
+                    MyShowFlowChartRecord &= FD & vbTab & "\Index=" & IndexFlowChart.ToString
+
+
+                    MsgBox("Halt")
+                    '''''If SplashWindowText.items.Count < CInt(FlowChart_Table_Rotation(SourceForm  ,   IndexFlowChart)) Then
+                    '''''MyShowFlowChartRecord &= FD & vbTab & "\Rotation=" & PrintAbleNull(FlowChart_Table_Rotation(SourceForm  ,   IndexFlowChart))
+                    '''''Else
+                    '''''MyShowFlowChartRecord &= FD & vbTab & "\Y2=" & PrintAbleNull(FlowChart_TableY2(SourceForm, IndexFlowChart).ToString)
+                    '''''End If
+                    MyShowFlowChartRecord &= FD & vbTab & "\DataType=" & PrintAbleNull(FlowChart_TableDataType(SourceForm, IndexFlowChart))
+                    MyShowFlowChartRecord &= FD & vbTab & "\PathName=" & PrintAbleNull(FlowChart_TablePathName(SourceForm, IndexFlowChart))
+                    MyShowFlowChartRecord &= FD & vbTab & "\PathNumber=" & PrintAbleNull(FlowChart_TablePathNumber(SourceForm, IndexFlowChart).ToString)
+                End If
+            Case "/Constant"
+                'todo make this into the correct import/export format
+                'This is for debugging only need to fix
+                'formatConstant="-Constant=name " & Comma &  " X" & Comma &  " Y" & Comma &  " Value"
+                'todo make this into the correct import/export format
+                If expanded = False Then
+                    MyShowFlowChartRecord = FlowChart_TableCode(SourceForm, IndexFlowChart) & "="
+                    'MyShowFlowChartRecord &= "=" & FindInSymbolList(SourceForm ,FlowChart_TableOther_Name(SourceForm    , IndexFlowChart))
+                    'MyShowFlowChartRecord &= FD & vbTab & vbTab & "/ConstantInfo" & FlowChart_TableCode(SourceForm ,  IndexFlowChart) & "=" & Net_TableLinks(BinarySearchList4Index(Options.ListBoxVariables,IndexFlowChart))
+                    MyShowFlowChartRecord &= FlowChart_TableX1(SourceForm, IndexFlowChart)
+                    MyShowFlowChartRecord &= FD & FlowChart_TableY1(SourceForm, IndexFlowChart)
+                    MyShowFlowChartRecord &= FD & FlowChart_TablePathName(SourceForm, IndexFlowChart)
+                Else
+                    MyShowFlowChartRecord = FlowChart_TableCode(SourceForm, IndexFlowChart) & "="
+                    MyShowFlowChartRecord &= FlowChart_TableX1(SourceForm, IndexFlowChart)
+                    MyShowFlowChartRecord &= FD & FlowChart_TableY1(SourceForm, IndexFlowChart)
+                    MyShowFlowChartRecord &= FD & FlowChart_TablePathName(SourceForm, IndexFlowChart)
+                    MyShowFlowChartRecord = FD & vbTab & "\DataType=" & PrintAbleNull(FlowChart_TableDataType(SourceForm, IndexFlowChart))
+                    MyShowFlowChartRecord &= FD & vbTab & "\Rotation=" & PrintAbleNull(FlowChart_Table_Rotation(SourceForm, IndexFlowChart))
+                    MyShowFlowChartRecord &= FD & vbTab & "\Option=" & FlowChart_TableOption(SourceForm, IndexFlowChart)
+                    MyShowFlowChartRecord &= FD & vbTab & "\DataType=" & FlowChart_TableDataType(SourceForm, IndexFlowChart)
+                    MyShowFlowChartRecord &= FD & vbTab & "\Index=" & IndexFlowChart.ToString
+                    MyShowFlowChartRecord &= FD & vbTab & "\PathNumber=" & PrintAbleNull(FlowChart_TablePathNumber(SourceForm, IndexFlowChart).ToString)
+                    MyShowFlowChartRecord = FlowChart_TableCode(SourceForm, IndexFlowChart) & "=" & FindInSymbolList(SourceForm, FlowChart_TableOther_Name(SourceForm, IndexFlowChart))
+                    MyShowFlowChartRecord &= FD & vbTab & vbTab & "/ConstantInfo" & FlowChart_TableCode(SourceForm, IndexFlowChart) & "=" & Net_TableLinks(IndexFlowChart)
+                    MyShowFlowChartRecord &= FD & FlowChart_TableX1(SourceForm, IndexFlowChart)
+                    MyShowFlowChartRecord &= FD & FlowChart_TableY1(SourceForm, IndexFlowChart) & ") "
+                    MyShowFlowChartRecord &= FD & vbTab & "\DataType=" & COMMA & PrintAbleNull(FlowChart_TableDataType(SourceForm, IndexFlowChart))
+                    MyShowFlowChartRecord &= FD & vbTab & "\Rotation=" & PrintAbleNull(FlowChart_Table_Rotation(SourceForm, IndexFlowChart))
+                    MyShowFlowChartRecord &= FD & vbTab & "\Option=" & FlowChart_TableOption(SourceForm, IndexFlowChart)
+                    MyShowFlowChartRecord &= FD & vbTab & "\DataType=" & FlowChart_TableDataType(SourceForm, IndexFlowChart)
+                    MyShowFlowChartRecord &= FD & vbTab & "\Index=" & IndexFlowChart.ToString
+                    MyShowFlowChartRecord &= FD & vbTab & "\PathName=" & PrintAbleNull(FlowChart_TablePathName(SourceForm, IndexFlowChart))
+                    MyShowFlowChartRecord &= FD & vbTab & "\PathNumber=" & PrintAbleNull(FlowChart_TablePathNumber(SourceForm, IndexFlowChart).ToString)
+                End If
+            Case My_keyWord(My_KeyConstRAW)
+                MyShowFlowChartRecord = FlowChart_TableCode(SourceForm, IndexFlowChart) & "="
+                MyShowFlowChartRecord &= FlowChart_TableX1(SourceForm, IndexFlowChart)
+                MyShowFlowChartRecord &= FD & FlowChart_TableY1(SourceForm, IndexFlowChart)
+                MyShowFlowChartRecord &= FD & FlowChart_TableSymbol_Name(SourceForm, IndexFlowChart)
+                If expanded = True Then
+                    MyShowFlowChartRecord &= vbTab & "\DataType=" & FlowChart_TableDataType(SourceForm, IndexFlowChart)
+                    MyShowFlowChartRecord &= vbTab & "\Index=" & IndexFlowChart.ToString
+                    MyShowFlowChartRecord &= FD & vbTab & "\PathName=" & PrintAbleNull(FlowChart_TablePathName(SourceForm, IndexFlowChart))
+                    MyShowFlowChartRecord &= FD & vbTab & "\Index=" & IndexFlowChart.ToString
+                    MyShowFlowChartRecord &= FD & vbTab & "\PathNumber=" & PrintAbleNull(FlowChart_TablePathNumber(SourceForm, IndexFlowChart).ToString)
+                    MyShowFlowChartRecord &= FD & vbTab & "\PathName=" & FlowChart_TablePathName(SourceForm, IndexFlowChart)
+                    MyShowFlowChartRecord &= FD & vbTab & "\SymbolName=" & FlowChart_TableSymbol_Name(SourceForm, IndexFlowChart)
+                    MyShowFlowChartRecord &= FD & vbTab & "\Path_SymbolName=" & FlowChart_Table_Path_SymbolName(SourceForm, IndexFlowChart)
+                    MyShowFlowChartRecord &= FD & vbTab & "\Option=" & FlowChart_TableOption(SourceForm, IndexFlowChart)
+                    MyShowFlowChartRecord &= FD & vbTab & "\DataType=" & FlowChart_TableDataType(SourceForm, IndexFlowChart)
+                    MyShowFlowChartRecord &= FD & vbTab & "\Rotation=" & FlowChart_Table_Rotation(SourceForm, IndexFlowChart)
+                End If
+            Case Else
+                MyShowFlowChartRecord = "\Invalid=" + FlowChart_TableCode(SourceForm, IndexFlowChart) & "=" & FindInSymbolList(SourceForm, FlowChart_TableOther_Name(SourceForm, IndexFlowChart))
+                MyShowFlowChartRecord &= FD & vbTab & "\=(X1=" & FlowChart_TableX1(SourceForm, IndexFlowChart)
+                MyShowFlowChartRecord &= FD & "Y1=" & FlowChart_TableY1(SourceForm, IndexFlowChart)
+                MyShowFlowChartRecord &= ")-(X2=" & FlowChart_TableX2(SourceForm, IndexFlowChart)
+                MyShowFlowChartRecord &= FD & "Y2=" & FlowChart_TableY2(SourceForm, IndexFlowChart) & ")"
+                If expanded = True Then
+                    MyShowFlowChartRecord &= FD & vbTab & "\index=" & IndexFlowChart.ToString
+                    MyShowFlowChartRecord &= FD & vbTab & "\Rotation=" & PrintAbleNull(FlowChart_Table_Rotation(SourceForm, IndexFlowChart))
+                    MyShowFlowChartRecord &= FD & vbTab & "\DataType=" & PrintAbleNull(FlowChart_TableDataType(SourceForm, IndexFlowChart))
+                    MyShowFlowChartRecord &= FD & vbTab & "\PathName=" & PrintAbleNull(FlowChart_TablePathName(SourceForm, IndexFlowChart))
+                    MyShowFlowChartRecord &= FD & vbTab & "\PathNumber=" & PrintAbleNull(FlowChart_TablePathNumber(SourceForm, IndexFlowChart).ToString)
+                End If
+        End Select
+        Return MyShowFlowChartRecord
+    End Function 'MyShowFlowChartRecord
+
+
+End Module

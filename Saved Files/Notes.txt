@@ -1,0 +1,20 @@
+Notes:
+points can be :
+	a variable (leads to a path)
+	An option (a list of possible values, enum ...)A keyword, or which option in a list of terminals
+	This is a departure from the keywords making up the symbol name
+
+/FlowChart = RuleName , GraphicName, Graphics
+	RuleName must match the rulename in the /Grammar=RuleName ::= ...
+	GraphicName Line
+	Graphics is the format  ColorName1 XY, XY, XY ... ColorName2, XY, XY ...
+		Where a new color name will start a new line in the symbol 
+		The XY must be between -250 and 250 (for now)
+	GraphicName = point (number)
+		These will make the next point in the symbol (for a variable)	
+		The point in the symbol will connect to a point in the flowchart.
+		If Number is zero or not provided (which will fix where the attachment 
+			point is then the next point will be used (which might be 
+			anywhere in the symbol)
+		
+

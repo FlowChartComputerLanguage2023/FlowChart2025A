@@ -1,0 +1,173 @@
+
+
+
+
+
+Imports System.IO
+Module Converting
+
+
+    'Routine 'Compile' is where it starts checking, then makes the text Output
+    Friend Function CompileThisSymbol(ByRef SourceForm As Source, IndexFlowChart As Integer) As String
+        Const FD As String = ","
+        Dim Symbol, Value As String
+        Dim MyConnectionsToMyCode As String
+        Dim Marker1, Marker2, Marker3, Switch1, Switch2 As String
+        Dim IndexNamed As Integer
+        Dim IndexSymbol As Integer
+        Dim StartAt, EndAt, ValueAt As Integer
+        ' DIM   NumberOfPoints As Integer
+        Dim MyFlag As String
+        Dim debug1 As String
+        CompileThisSymbol = ""
+        'First check that every marker in the syntax has an attribute defined in the graphics to text source code
+        If FlowChart_TableCode(SourceForm, IndexFlowChart) <> "/use" Then
+            Return MyShowFlowChartRecord(SourceForm, False, IndexFlowChart)
+        End If
+        Symbol = FlowChart_TableSymbol_Name(SourceForm, IndexFlowChart)
+        IndexNamed = FindInNamedList(Symbol)
+        Log(1639, Err6, MyShowNamedRecord(False, IndexNamed))
+        IndexSymbol = Named_FileSymbolIndexes(IndexNamed)
+        Log(1640, Err6, MyShowNamedAndSymbolRecords(SourceForm, False, IndexSymbol))
+        If IndexNamed < 1 Then
+            Return CompileThisSymbol
+        End If
+        CompileThisSymbol = Named_TableSyntax(IndexNamed) ' Named_TableMicroCodeText(IndexNamed)
+        MyConnectionsToMyCode = MyShowAndUpDateProperties(SourceForm, IndexFlowChart)
+
+        While 1 = 1
+            Log(1068, Err1, CompileThisSymbol & vbTab & MyShowFlowChartRecord(SourceForm, False, IndexFlowChart))
+            Marker1 = GetMarker(0, VBSpace & CompileThisSymbol)
+            Value = NoRM(Marker1)
+            If Marker1 = "" Then
+                Exit While
+            End If
+            Switch1 = "/" & NoRM(Marker1)
+            Marker2 = Marker1
+            Marker3 = Pop_Attribute(Marker2)
+            If MyInStr(".", Marker1) <> 0 Then
+                Switch2 = CommonRoutines.Parse2(NoRM(Marker1))
+                If MyInStr(".", Switch2) <> 0 Then
+                    Switch2 = Mid(Switch2, 1, MyInStr(".", Switch2) - 1)
+                Else
+                    Switch2 = Marker1
+                End If
+            Else
+                Switch2 = ""
+            End If
+            Log(1069, Marker1, Marker2, Marker3, Switch1, Switch2, Value, CompileThisSymbol)
+            StartAt = MyInStr(Switch1, MyConnectionsToMyCode)
+            If StartAt = 0 Then
+                StartAt = MyInStr("/" & NoRM(Marker1), MyConnectionsToMyCode)
+            End If
+            If StartAt = 0 Then
+                StartAt = MyInStr("/" & Switch2, MyConnectionsToMyCode)
+            End If
+            MyFlag = NoRM(Mid(Marker1, MyInStr(".", Marker1) + 1))
+
+            If StartAt > 0 Then
+                ValueAt = MyInStr("=", MyConnectionsToMyCode & "=", StartAt + 1) + 1
+                EndAt = MyInStr("/", MyConnectionsToMyCode & "/", StartAt + 1)
+                Value = MyTrim(Mid(MyConnectionsToMyCode, ValueAt, EndAt - ValueAt))
+                Log(1259, Marker1, Switch1, Mid(MyConnectionsToMyCode, StartAt, EndAt - StartAt), Value)
+            ElseIf Left(NoRM(Marker1), 7) = "keyword" And MyInStr(".", Marker1) <> 0 Then
+                ValueAt = MyInStr(".", Marker1)
+                If ValueAt <> 0 Then
+                    Value = Mid(Marker1, ValueAt + 1)
+                    Value = MyTrim(NoRM(Value))
+                End If
+            Else
+                Value = "ERROR "
+                If MyOptionTest(25) = True Then
+                Else
+                End If
+            End If
+            debug1 = CompileThisSymbol
+            Log(1682, Err8, Marker1 & Value)
+            CompileThisSymbol = CompileThisSymbol.Replace(Marker1, Value)
+            'If MyDebug(A_DISPLAY) Then
+            If debug1 <> CompileThisSymbol Then
+                Log(1254, Err8, debug1 & CT & CompileThisSymbol)
+            End If
+            '''''Log ( 0, 1256, IndexFlowChart.ToString, CompileThisSymbol, MyShowFlowChartRecord(SourceForm, False, IndexFlowChart))
+        End While
+        CompileThisSymbol = Strings.Replace(CompileThisSymbol, FD, MyUniverse.ProgramOptions.FCCL_WhiteSpace, 1, -1, CompareMethod.Text)
+        Return CompileThisSymbol
+    End Function
+
+
+    Friend Sub MyCompile(ByRef SourceForm As Source) ' Converts from a FlowChart into Source Code
+        Dim IndexFlowChart As Integer
+        Dim IndexNamed As Integer
+        Dim IndexSymbol As Integer
+        Dim IndexNetLinks As Integer
+        Dim OutputFileName As String
+        Dim MyCode As String
+        Dim Temp As String
+        Dim Connections As String
+
+        MyUniverse.MySS = FillImportLine()
+
+        '''''ShowAllWindows(ShowWindow, HideWindow, HideWindow, HideWindow)
+        OLD.Clear_Window(SourceForm.FlowChartPictureBox)
+        OutputFileName = XOpenFile("compile",
+                                   "Saving the compiled source For " &
+                                    MyUniverse.SysGen.Constants.DrillDown_FileName & "." & ThisExtension(Options.ListBoxSymbolData.Items.Item(25).ToString, 1),
+                                   MyUniverse.SysGen.Constants.DrillDown_FileName)
+        If OutputFileName = Nothing Then Return
+        If Dir(OutputFileName) = "" Then ' need to create the file if it does not exist then you can ... 
+            'System.IO.File.Create(OutputFileName)
+            Using Writer As System.IO.StreamWriter = System.IO.File.CreateText(OutputFileName)
+            End Using
+        End If
+        Using mywriter As New StreamWriter(OutputFileName)
+            If MyOptionTest(59) Then
+                OLD.Clear_Window(SourceForm.FlowChartPictureBox)
+                For IndexNetLinks = 1 To UBound(Net_FileLinks)
+                    'todo need to make this into a valid statement to define a variable's data type ( DIM   X as DataType, Datatype X; )
+                    Log(2262, Err1, MyShowNetLinks(SourceForm, IndexNetLinks))
+                    Temp = Net_TableLinks(IndexNetLinks)
+                    MyCode = MyUniverse.ProgramOptions.FCCL_Dimension
+                    MyCode = Strings.Replace(MyCode, "DataType", FlowChart_TableDataType(SourceForm, PopNonZeroValue(Temp)), 1, 10)
+                    MyCode = Strings.Replace(MyCode, "Variable", Net_TablePathNames(IndexNetLinks), 1, 10)
+                    MyWriteLine1(mywriter, MyCode)
+                    MyWriteLine1(mywriter, MyShowNetLinks(SourceForm, IndexNetLinks))
+                    While Len(Temp) > 0
+                        IndexFlowChart = PopValue(Temp)
+                        PaintAll(SourceForm, IndexFlowChart, IndexFlowChart)
+                    End While
+                Next IndexNetLinks
+            End If
+
+            For IndexFlowChart = 1 To TopOfListBox(SourceForm.ListBoxFlowChart)
+                PaintEachOne(SourceForm, IndexFlowChart)
+                Connections = MyShowAndUpDateProperties(SourceForm, IndexFlowChart) ',MyUniverse.MySS.Inputs.LineNumberIn,FlowChart_tablePathSymbolName(SourceForm, IndexFlowChart))
+                Select Case FlowChart_TableCode(SourceForm, IndexFlowChart)
+                    Case My_keyWord(My_KeyConstUse)
+                        IndexNamed = BinarySearchList4Index(Options.ListBoxSymbols, FlowChart_TableSymbol_Name(SourceForm, IndexFlowChart))
+                        IndexSymbol = Named_FileSymbolName_ISAM(IndexNamed)
+                        MyCode = CompileEachSymbol(SourceForm, IndexFlowChart)
+                        If MyOptionTest(16) = True Then
+                            MyCode = MyCode & Options.ListBoxSymbolData.Items.Item(21).ToString & " Line " & MyUniverse.MySS.Inputs.LineNumberIn
+                        Else
+                        End If
+                        MyWriteLine1(mywriter, MyCode)
+                        MyUniverse.MySS.Inputs.LineNumberIn += 1
+                        OLD.DisplayStatus(3212, MyUniverse.MySS.Inputs.LineNumberIn.ToString)
+                        MyPlacement(SourceForm, True)'Third place it should add
+                    Case "/path"
+                        RouterConnectPath(SourceForm, IndexFlowChart)
+                    Case "/error"
+                    Case "/constant"
+                    Case "/Delete"
+                    Case Else
+                        Log(2231, FlowChart_TableCode(SourceForm, IndexFlowChart), IndexFlowChart.ToString)
+                End Select
+            Next
+        End Using
+        'FileClose(MyWriter)
+        'End Using
+        OLD.Clear_Window(SourceForm.FlowChartPictureBox)
+    End Sub
+
+End Module
